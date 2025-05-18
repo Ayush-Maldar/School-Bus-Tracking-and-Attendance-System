@@ -1,0 +1,219 @@
+schoolwaydb=# \dt
+             List of relations
+ Schema |     Name      | Type  |  Owner
+--------+---------------+-------+----------
+ public | attendance    | table | postgres
+ public | bus_staff     | table | postgres
+ public | buses         | table | postgres
+ public | gps_logs      | table | postgres
+ public | notifications | table | postgres
+ public | parents       | table | postgres
+ public | routes        | table | postgres
+ public | students      | table | postgres
+ public | users         | table | postgres
+(9 rows)
+
+
+schoolwaydb=# \dn
+      List of schemas
+  Name  |       Owner
+--------+-------------------
+ public | pg_database_owner
+(1 row)
+
+
+schoolwaydb=# \d+
+                                                     List of relations
+ Schema |               Name                |   Type   |  Owner   | Persistence | Access method |    Size    | Description
+--------+-----------------------------------+----------+----------+-------------+---------------+------------+-------------
+ public | attendance                        | table    | postgres | permanent   | heap          | 8192 bytes |
+ public | attendance_attendance_id_seq      | sequence | postgres | permanent   |               | 8192 bytes |
+ public | bus_staff                         | table    | postgres | permanent   | heap          | 16 kB      |
+ public | bus_staff_staff_id_seq            | sequence | postgres | permanent   |               | 8192 bytes |
+ public | buses                             | table    | postgres | permanent   | heap          | 8192 bytes |
+ public | buses_bus_id_seq                  | sequence | postgres | permanent   |               | 8192 bytes |
+ public | gps_logs                          | table    | postgres | permanent   | heap          | 16 kB      |
+ public | gps_logs_gps_id_seq               | sequence | postgres | permanent   |               | 8192 bytes |
+ public | notifications                     | table    | postgres | permanent   | heap          | 16 kB      |
+ public | notifications_notification_id_seq | sequence | postgres | permanent   |               | 8192 bytes |
+ public | parents                           | table    | postgres | permanent   | heap          | 8192 bytes |
+ public | parents_parent_id_seq             | sequence | postgres | permanent   |               | 8192 bytes |
+ public | routes                            | table    | postgres | permanent   | heap          | 16 kB      |
+ public | routes_route_id_seq               | sequence | postgres | permanent   |               | 8192 bytes |
+ public | students                          | table    | postgres | permanent   | heap          | 16 kB      |
+ public | students_student_id_seq           | sequence | postgres | permanent   |               | 8192 bytes |
+ public | users                             | table    | postgres | permanent   | heap          | 16 kB      |
+ public | users_user_id_seq                 | sequence | postgres | permanent   |               | 8192 bytes |
+(18 rows)
+
+
+schoolwaydb=# \d+ attendance
+                                                                          Table "public.attendance"
+    Column     |            Type             | Collation | Nullable |                      Default
+| Storage  | Compression | Stats target | Description
+---------------+-----------------------------+-----------+----------+---------------------------------------------------+----------+-------------+--------------+-------------
+ attendance_id | integer                     |           | not null | nextval('attendance_attendance_id_seq'::regclass) | plain    |             |              |
+ student_id    | integer                     |           | not null |
+| plain    |             |              |
+ date          | date                        |           | not null |
+| plain    |             |              |
+ status        | character varying(10)       |           | not null |
+| extended |             |              |
+ timestamp     | timestamp without time zone |           |          | CURRENT_TIMESTAMP
+| plain    |             |              |
+Indexes:
+    "attendance_pkey" PRIMARY KEY, btree (attendance_id)
+Foreign-key constraints:
+    "attendance_student_id_fkey" FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE
+Access method: heap
+
+
+schoolwaydb=# \d+ users
+                                                                          Table "public.users"
+       Column       |            Type             | Collation | Nullable |                Default                 | Storage  | Compression | Stats target | Description
+--------------------+-----------------------------+-----------+----------+----------------------------------------+----------+-------------+--------------+-------------
+ user_id            | integer                     |           | not null | nextval('users_user_id_seq'::regclass) | plain    |             |              |
+ first_name         | character varying(50)       |           | not null |                                        | extended |             |              |
+ last_name          | character varying(50)       |           | not null |                                        | extended |             |              |
+ phone_number       | character varying(15)       |           | not null |                                        | extended |             |              |
+ email              | character varying(100)      |           | not null |                                        | extended |             |              |
+ password           | text                        |           | not null |                                        | extended |             |              |
+ role               | character varying(20)       |           | not null |                                        | extended |             |              |
+ login_attempts     | integer                     |           |          | 0                                      | plain    |             |              |
+ account_locked     | boolean                     |           |          | false                                  | plain    |             |              |
+ last_login         | timestamp without time zone |           |          |                                        | plain    |             |              |
+ reset_token        | text                        |           |          |                                        | extended |             |              |
+ reset_token_expiry | timestamp without time zone |           |          |                                        | plain    |             |              |
+ fcm_token          | text                        |           |          |                                        | extended |             |              |
+Indexes:
+    "users_pkey" PRIMARY KEY, btree (user_id)
+    "users_email_key" UNIQUE CONSTRAINT, btree (email)
+    "users_phone_number_key" UNIQUE CONSTRAINT, btree (phone_number)
+Referenced by:
+    TABLE "bus_staff" CONSTRAINT "bus_staff_user_id_fkey" FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+    TABLE "parents" CONSTRAINT "parents_user_id_fkey" FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+Access method: heap
+
+
+schoolwaydb=#
+schoolwaydb=#
+schoolwaydb=#
+schoolwaydb=# \d+ students
+                                                                      Table "public.students"
+    Column     |         Type          | Collation | Nullable |                   Default                    | Storage  | Compression | Stats target | Description
+---------------+-----------------------+-----------+----------+----------------------------------------------+----------+-------------+--------------+-------------
+ student_id    | integer               |           | not null | nextval('students_student_id_seq'::regclass) | plain    |             |              |
+ first_name    | character varying(50) |           | not null |                                              | extended |             |              |
+ last_name     | character varying(50) |           | not null |                                              | extended |             |              |
+ class         | character varying(20) |           | not null |                                              | extended |             |              |
+ parent_id     | integer               |           | not null |                                              | plain    |             |              |
+ bus_id        | integer               |           | not null |                                              | plain    |             |              |
+ roll_no       | character varying(50) |           | not null |                                              | extended |             |              |
+ qr_code_image | bytea                 |           |          |                                              | extended |             |              |
+Indexes:
+    "students_pkey" PRIMARY KEY, btree (student_id)
+Foreign-key constraints:
+    "students_bus_id_fkey" FOREIGN KEY (bus_id) REFERENCES buses(bus_id) ON DELETE SET NULL
+    "students_parent_id_fkey" FOREIGN KEY (parent_id) REFERENCES parents(parent_id) ON DELETE CASCADE
+Referenced by:
+    TABLE "attendance" CONSTRAINT "attendance_student_id_fkey" FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE
+Access method: heap
+
+
+schoolwaydb=#
+schoolwaydb=#
+schoolwaydb=#
+schoolwaydb=#
+schoolwaydb=# \d+ bus_stff
+Did not find any relation named "bus_stff".
+schoolwaydb=# \d+ bus_staff
+                                                           Table "public.bus_staff"
+  Column  |  Type   | Collation | Nullable |                   Default                   | Storage  | Compression | Stats target | Description
+----------+---------+-----------+----------+---------------------------------------------+----------+-------------+--------------+-------------
+ staff_id | integer |           | not null | nextval('bus_staff_staff_id_seq'::regclass) | plain    |             |              |
+ user_id  | integer |           | not null |                                             | plain    |             |              |
+ photo    | bytea   |           |          |                                             | extended |             |              |
+Indexes:
+    "bus_staff_pkey" PRIMARY KEY, btree (staff_id)
+    "bus_staff_user_id_key" UNIQUE CONSTRAINT, btree (user_id)
+Foreign-key constraints:
+    "bus_staff_user_id_fkey" FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+Referenced by:
+    TABLE "buses" CONSTRAINT "buses_attendant_id_fkey" FOREIGN KEY (attendant_id) REFERENCES bus_staff(staff_id) ON DELETE SET NULL
+    TABLE "buses" CONSTRAINT "buses_driver_id_fkey" FOREIGN KEY (driver_id) REFERENCES bus_staff(staff_id) ON DELETE SET NULL
+Access method: heap
+
+
+schoolwaydb=# \d+ buses
+                                                                   Table "public.buses"
+    Column    |         Type          | Collation | Nullable |                Default                | Storage  | Compression | Stats target | Description
+--------------+-----------------------+-----------+----------+---------------------------------------+----------+-------------+--------------+-------------
+ bus_id       | integer               |           | not null | nextval('buses_bus_id_seq'::regclass) | plain    |             |              |
+ bus_plate    | character varying(20) |           | not null |                                       | extended |             |              |
+ route_id     | integer               |           | not null |                                       | plain    |             |              |
+ driver_id    | integer               |           | not null |                                       | plain    |             |              |
+ attendant_id | integer               |           | not null |                                       | plain    |             |              |
+Indexes:
+    "buses_pkey" PRIMARY KEY, btree (bus_id)
+    "buses_bus_plate_key" UNIQUE CONSTRAINT, btree (bus_plate)
+Foreign-key constraints:
+    "buses_attendant_id_fkey" FOREIGN KEY (attendant_id) REFERENCES bus_staff(staff_id) ON DELETE SET NULL
+    "buses_driver_id_fkey" FOREIGN KEY (driver_id) REFERENCES bus_staff(staff_id) ON DELETE SET NULL
+    "buses_route_id_fkey" FOREIGN KEY (route_id) REFERENCES routes(route_id) ON DELETE SET NULL
+Referenced by:
+    TABLE "gps_logs" CONSTRAINT "gps_logs_bus_id_fkey" FOREIGN KEY (bus_id) REFERENCES buses(bus_id) ON DELETE CASCADE
+    TABLE "students" CONSTRAINT "students_bus_id_fkey" FOREIGN KEY (bus_id) REFERENCES buses(bus_id) ON DELETE SET NULL
+Access method: heap
+
+
+schoolwaydb=# \d+ routes
+                                                                      Table "public.routes"
+     Column     |          Type          | Collation | Nullable |                 Default                  | Storage  | Compression | Stats target | Description
+----------------+------------------------+-----------+----------+------------------------------------------+----------+-------------+--------------+-------------
+ route_id       | integer                |           | not null | nextval('routes_route_id_seq'::regclass) | plain    |             |              |
+ route_name     | character varying(100) |           | not null |                                          | extended |             |              |
+ start_location | character varying(255) |           | not null |                                          | extended |             |              |
+ end_location   | character varying(255) |           | not null |                                          | extended |             |              |
+ stops          | jsonb                  |           | not null |                                          | extended |             |              |
+Indexes:
+    "routes_pkey" PRIMARY KEY, btree (route_id)
+Referenced by:
+    TABLE "buses" CONSTRAINT "buses_route_id_fkey" FOREIGN KEY (route_id) REFERENCES routes(route_id) ON DELETE SET NULLAccess method: heap
+
+
+schoolwaydb=# \d+ gps_logs
+                                                                    Table "public.gps_logs"
+  Column   |            Type             | Collation | Nullable |                 Default                  | Storage | Compression | Stats target | Description
+-----------+-----------------------------+-----------+----------+------------------------------------------+---------+-------------+--------------+-------------
+ gps_id    | integer                     |           | not null | nextval('gps_logs_gps_id_seq'::regclass) | plain   |             |              |
+ bus_id    | integer                     |           | not null |                                          | plain   |             |              |
+ latitude  | numeric(10,7)               |           | not null |                                          | main    |             |              |
+ longitude | numeric(10,7)               |           | not null |                                          | main    |             |              |
+ timestamp | timestamp without time zone |           |          | CURRENT_TIMESTAMP                        | plain   |             |              |
+Indexes:
+    "gps_logs_pkey" PRIMARY KEY, btree (gps_id)
+Foreign-key constraints:
+    "gps_logs_bus_id_fkey" FOREIGN KEY (bus_id) REFERENCES buses(bus_id) ON DELETE CASCADE
+Access method: heap
+
+
+schoolwaydb=# \d+ notifications
+                                                                            Table "public.notifications"
+     Column      |            Type             | Collation | Nullable |                        Default
+       | Storage  | Compression | Stats target | Description
+-----------------+-----------------------------+-----------+----------+--------------------------------------------------------+----------+-------------+--------------+-------------
+ notification_id | integer                     |           | not null | nextval('notifications_notification_id_seq'::regclass) | plain    |             |              |
+ parent_id       | integer                     |           | not null |
+       | plain    |             |              |
+ message         | text                        |           | not null |
+       | extended |             |              |
+ timestamp       | timestamp without time zone |           |          | CURRENT_TIMESTAMP
+       | plain    |             |              |
+Indexes:
+    "notifications_pkey" PRIMARY KEY, btree (notification_id)
+Foreign-key constraints:
+    "notifications_parent_id_fkey" FOREIGN KEY (parent_id) REFERENCES parents(parent_id) ON DELETE CASCADE
+Access method: heap
+
+
+schoolwaydb=#

@@ -1,0 +1,170 @@
+schoolwaydb=# \d users
+                                               Table "public.users"
+       Column       |            Type             | Collation | Nullable |                Default
+--------------------+-----------------------------+-----------+----------+----------------------------------------
+ user_id            | integer                     |           | not null | nextval('users_user_id_seq'::regclass)
+ first_name         | character varying(50)       |           | not null |
+ last_name          | character varying(50)       |           | not null |
+ phone_number       | character varying(15)       |           | not null |
+ email              | character varying(100)      |           | not null |
+ password           | text                        |           | not null |
+ role               | character varying(20)       |           | not null |
+ login_attempts     | integer                     |           |          | 0
+ account_locked     | boolean                     |           |          | false
+ last_login         | timestamp without time zone |           |          |
+ reset_token        | text                        |           |          |
+ reset_token_expiry | timestamp without time zone |           |          |
+ fcm_token          | text                        |           |          |
+Indexes:
+    "users_pkey" PRIMARY KEY, btree (user_id)
+    "users_email_key" UNIQUE CONSTRAINT, btree (email)
+    "users_phone_number_key" UNIQUE CONSTRAINT, btree (phone_number)
+Referenced by:
+    TABLE "bus_staff" CONSTRAINT "bus_staff_user_id_fkey" FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+    TABLE "parents" CONSTRAINT "parents_user_id_fkey" FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+
+
+schoolwaydb=# \d students
+                                           Table "public.students"
+    Column     |         Type          | Collation | Nullable |                   Default
+---------------+-----------------------+-----------+----------+----------------------------------------------
+ student_id    | integer               |           | not null | nextval('students_student_id_seq'::regclass)
+ first_name    | character varying(50) |           | not null |
+ last_name     | character varying(50) |           | not null |
+ class         | character varying(20) |           | not null |
+ parent_id     | integer               |           | not null |
+ bus_id        | integer               |           | not null |
+ roll_no       | character varying(50) |           | not null |
+ qr_code_image | bytea                 |           |          |
+Indexes:
+    "students_pkey" PRIMARY KEY, btree (student_id)
+Foreign-key constraints:
+    "students_bus_id_fkey" FOREIGN KEY (bus_id) REFERENCES buses(bus_id) ON DELETE SET NULL
+    "students_parent_id_fkey" FOREIGN KEY (parent_id) REFERENCES parents(parent_id) ON DELETE CASCADE
+Referenced by:
+    TABLE "attendance" CONSTRAINT "attendance_student_id_fkey" FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE
+
+
+schoolwaydb=# \d parents
+                                 Table "public.parents"
+  Column   |  Type   | Collation | Nullable |                  Default
+-----------+---------+-----------+----------+--------------------------------------------
+ parent_id | integer |           | not null | nextval('parents_parent_id_seq'::regclass)
+ user_id   | integer |           | not null |
+Indexes:
+    "parents_pkey" PRIMARY KEY, btree (parent_id)
+    "parents_user_id_key" UNIQUE CONSTRAINT, btree (user_id)
+Foreign-key constraints:
+    "parents_user_id_fkey" FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+Referenced by:
+    TABLE "notifications" CONSTRAINT "notifications_parent_id_fkey" FOREIGN KEY (parent_id) REFERENCES parents(parent_id) ON DELETE CASCADE
+    TABLE "students" CONSTRAINT "students_parent_id_fkey" FOREIGN KEY (parent_id) REFERENCES parents(parent_id) ON DELETE CASCADE
+
+
+schoolwaydb=# \d buses
+                                        Table "public.buses"
+    Column    |         Type          | Collation | Nullable |                Default
+--------------+-----------------------+-----------+----------+---------------------------------------
+ bus_id       | integer               |           | not null | nextval('buses_bus_id_seq'::regclass)
+ bus_plate    | character varying(20) |           | not null |
+ route_id     | integer               |           | not null |
+ driver_id    | integer               |           | not null |
+ attendant_id | integer               |           | not null |
+Indexes:
+    "buses_pkey" PRIMARY KEY, btree (bus_id)
+    "buses_bus_plate_key" UNIQUE CONSTRAINT, btree (bus_plate)
+Foreign-key constraints:
+    "buses_attendant_id_fkey" FOREIGN KEY (attendant_id) REFERENCES bus_staff(staff_id) ON DELETE SET NULL
+    "buses_driver_id_fkey" FOREIGN KEY (driver_id) REFERENCES bus_staff(staff_id) ON DELETE SET NULL
+    "buses_route_id_fkey" FOREIGN KEY (route_id) REFERENCES routes(route_id) ON DELETE SET NULL
+Referenced by:
+    TABLE "gps_logs" CONSTRAINT "gps_logs_bus_id_fkey" FOREIGN KEY (bus_id) REFERENCES buses(bus_id) ON DELETE CASCADE
+    TABLE "students" CONSTRAINT "students_bus_id_fkey" FOREIGN KEY (bus_id) REFERENCES buses(bus_id) ON DELETE SET NULL
+
+
+schoolwaydb=# \d bus_staff
+                                Table "public.bus_staff"
+  Column  |  Type   | Collation | Nullable |                   Default
+----------+---------+-----------+----------+---------------------------------------------
+ staff_id | integer |           | not null | nextval('bus_staff_staff_id_seq'::regclass)
+ user_id  | integer |           | not null |
+ photo    | bytea   |           |          |
+Indexes:
+    "bus_staff_pkey" PRIMARY KEY, btree (staff_id)
+    "bus_staff_user_id_key" UNIQUE CONSTRAINT, btree (user_id)
+Foreign-key constraints:
+    "bus_staff_user_id_fkey" FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+Referenced by:
+    TABLE "buses" CONSTRAINT "buses_attendant_id_fkey" FOREIGN KEY (attendant_id) REFERENCES bus_staff(staff_id) ON DELETE SET NULL
+    TABLE "buses" CONSTRAINT "buses_driver_id_fkey" FOREIGN KEY (driver_id) REFERENCES bus_staff(staff_id) ON DELETE SET NULL
+
+
+schoolwaydb=# \d routes
+                                               Table "public.routes"
+         Column         |          Type          | Collation | Nullable |                 Default
+------------------------+------------------------+-----------+----------+------------------------------------------
+ route_id               | integer                |           | not null | nextval('routes_route_id_seq'::regclass)
+ route_name             | character varying(100) |           | not null |
+ start_location         | character varying(255) |           | not null |
+ end_location           | character varying(255) |           | not null |
+ route_path_coordinates | jsonb                  |           |          |
+Indexes:
+    "routes_pkey" PRIMARY KEY, btree (route_id)
+Referenced by:
+    TABLE "buses" CONSTRAINT "buses_route_id_fkey" FOREIGN KEY (route_id) REFERENCES routes(route_id) ON DELETE SET NULL
+    TABLE "route_stops" CONSTRAINT "route_stops_route_id_fkey" FOREIGN KEY (route_id) REFERENCES routes(route_id) ON DELETE CASCADE
+
+
+schoolwaydb=# \d route_stops
+                                             Table "public.route_stops"
+     Column     |            Type             | Collation | Nullable |                   Default
+----------------+-----------------------------+-----------+----------+----------------------------------------------
+ stop_id        | integer                     |           | not null | nextval('route_stops_stop_id_seq'::regclass)
+ route_id       | integer                     |           | not null |
+ stop_name      | character varying(150)      |           | not null |
+ latitude       | numeric(10,8)               |           | not null |
+ longitude      | numeric(11,8)               |           | not null |
+ sequence_order | integer                     |           | not null |
+ created_at     | timestamp without time zone |           |          | CURRENT_TIMESTAMP
+Indexes:
+    "route_stops_pkey" PRIMARY KEY, btree (stop_id)
+    "idx_route_stops_route_id" btree (route_id)
+    "route_stops_route_id_sequence_order_key" UNIQUE CONSTRAINT, btree (route_id, sequence_order)
+    "route_stops_route_id_stop_name_key" UNIQUE CONSTRAINT, btree (route_id, stop_name)
+Foreign-key constraints:
+    "route_stops_route_id_fkey" FOREIGN KEY (route_id) REFERENCES routes(route_id) ON DELETE CASCADE
+
+
+schoolwaydb=# \d gps_logs
+                                        Table "public.gps_logs"
+  Column   |           Type           | Collation | Nullable |                 Default
+-----------+--------------------------+-----------+----------+------------------------------------------
+ gps_id    | integer                  |           | not null | nextval('gps_logs_gps_id_seq'::regclass)
+ bus_id    | integer                  |           | not null |
+ latitude  | numeric(10,7)            |           | not null |
+ longitude | numeric(10,7)            |           | not null |
+ timestamp | timestamp with time zone |           |          | CURRENT_TIMESTAMP
+Indexes:
+    "gps_logs_pkey" PRIMARY KEY, btree (gps_id)
+Foreign-key constraints:
+    "gps_logs_bus_id_fkey" FOREIGN KEY (bus_id) REFERENCES buses(bus_id) ON DELETE CASCADE
+
+
+schoolwaydb=# \d attendace
+Did not find any relation named "attendace".
+schoolwaydb=# \d attendaces
+Did not find any relation named "attendaces".
+schoolwaydb=# \d attendance
+                                               Table "public.attendance"
+    Column     |            Type             | Collation | Nullable |                      Default
+---------------+-----------------------------+-----------+----------+---------------------------------------------------
+ attendance_id | integer                     |           | not null | nextval('attendance_attendance_id_seq'::regclass)
+ student_id    | integer                     |           | not null |
+ date          | date                        |           | not null |
+ status        | character varying(10)       |           | not null |
+ timestamp     | timestamp without time zone |           |          | CURRENT_TIMESTAMP
+ name          | character varying           |           |          |
+Indexes:
+    "attendance_pkey" PRIMARY KEY, btree (attendance_id)
+Foreign-key constraints:
+    "attendance_student_id_fkey" FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE
