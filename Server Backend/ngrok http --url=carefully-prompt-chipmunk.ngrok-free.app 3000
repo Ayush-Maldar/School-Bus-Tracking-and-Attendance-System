@@ -1,0 +1,9 @@
+ngrok http --url=sawfly-pro-cowbird.ngrok-free.app 3000 
+
+
+
+
+SELECT DISTINCT ON (student_id)
+    student_id, status, timestamp
+FROM attendance
+ORDER BY student_id, timestamp DESC;
