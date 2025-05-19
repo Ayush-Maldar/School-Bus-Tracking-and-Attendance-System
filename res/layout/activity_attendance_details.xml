@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true"
+    android:background="@drawable/background"
+    tools:context=".AttendanceDetailsActivity">
+
+    <LinearLayout
+        android:id="@+id/header_layout"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:background="@color/app_yellow">
+
+        <TextView
+            android:id="@+id/student_name_header"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Student Attendance"
+            android:textColor="@color/black"
+            style="@style/TextAppearance.Material3.HeadlineSmall"
+            android:fontFamily="@font/poppins_family"
+            android:textStyle="bold"
+            tools:text="Student Name - Attendance" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Weekly Attendance"
+                android:textAppearance="?attr/textAppearanceHeadline6"
+                android:fontFamily="@font/poppins_family"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+
+            <TextView
+                android:id="@+id/weekly_attendance_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Loading..."
+                android:fontFamily="@font/poppins_family"
+                android:textAppearance="?attr/textAppearanceBody1"
+                android:gravity="center_horizontal" android:layout_marginBottom="16dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Monthly Attendance"
+                android:textAppearance="?attr/textAppearanceHeadline6"
+                android:fontFamily="@font/poppins_family"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+
+            <TextView
+                android:id="@+id/monthly_attendance_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Loading..."
+                android:fontFamily="@font/poppins_family"
+                android:textAppearance="?attr/textAppearanceBody1"
+                android:gravity="center_horizontal" android:layout_marginBottom="24dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/generate_report_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxWidth="400dp" android:layout_gravity="center_horizontal" android:text="Generate Attendance Report"
+                android:fontFamily="@font/poppins_family"
+                android:textStyle="bold"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                app:cornerRadius="8dp"
+                app:backgroundTint="@color/app_yellow"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
